@@ -17,8 +17,11 @@ import android.view.inputmethod.InputMethodManager;
 import com.example.dharkael.tweeter.R;
 import com.example.dharkael.tweeter.TweeterApp;
 import com.example.dharkael.tweeter.api.LoginResponse;
+import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 import com.example.dharkael.tweeter.databinding.ActivityLoginBinding;
 import com.example.dharkael.tweeter.ui.login.LoginViewModel.Resource;
+
+import java.util.Date;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -31,7 +34,7 @@ public class LoginActivity extends LifecycleActivity {
     ViewModelProvider.Factory viewModelFactory;
     ActivityLoginBinding activityBinding;
     LoginViewModel viewModel;
-     LiveData<Resource<LoginResponse>> loginData;
+    LiveData<Resource<LoginResponse>> loginData;
 
     public static Intent intentForStart(Context context) {
         return new Intent(context, LoginActivity.class);
@@ -46,7 +49,7 @@ public class LoginActivity extends LifecycleActivity {
     }
 
     void bindViewModel() {
-         viewModel =
+        viewModel =
                 ViewModelProviders.of(this, viewModelFactory)
                         .get(LoginViewModel.class);
         activityBinding
@@ -69,13 +72,13 @@ public class LoginActivity extends LifecycleActivity {
 
     }
 
-    void showOverlay(boolean show){
-        if(show){
+    void showOverlay(boolean show) {
+        if (show) {
             activityBinding.viewLoginOverlay.setVisibility(View.VISIBLE);
             activityBinding.viewLoginOverlay.requestFocus();
             //Dismiss Keyboard
             InputMethodManager imm = (InputMethodManager)
-            getSystemService(Context.INPUT_METHOD_SERVICE);
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(
                     activityBinding.editTextLoginPassword.getWindowToken(), 0);
         } else {
@@ -84,38 +87,40 @@ public class LoginActivity extends LifecycleActivity {
     }
 
 
-    void processLoginResource(@Nonnull Resource<LoginResponse> resource){
-        Log.i("LoginActivity", "processLoginResource"+ resource.status);
-        switch (resource.status){
+    void processLoginResource(@Nonnull Resource<LoginResponse> resource) {
+        Log.i("LoginActivity", "processLoginResource" + resource.status);
+        switch (resource.status) {
             case LOADING: {
                 // Block/Disable UI
-               showOverlay(true);
+                showOverlay(true);
                 return;
             }
 
             case SUCCESS: {
-                //TODO process
-                //TODO We need to store data first
                 final LoginResponse loginResponse = resource.data;
-                if(loginResponse != null && loginResponse.isSuccessful()){
-                    Log.i("LoginActivity", "processLoginResource: "+ loginResponse.userId);
-
-                 break;
+                if (loginResponse != null && loginResponse.isSuccessful()) {
+                    Log.i("LoginActivity", "processLoginResource: " + loginResponse.userId);
+                    final AuthenticatedUserId authenticatedUserId =
+                            new AuthenticatedUserId(loginResponse.userId, new Date().getTime());
+                    viewModel.setAuthenticatedUserId(authenticatedUserId);
+                    Snackbar.make(activityBinding.buttonLoginSubmit, "Finishing with userID "+ authenticatedUserId.userId,Snackbar.LENGTH_LONG).show();
+                    finish();
+                    break;
                 }
                 //display error message/dialog
-                if(loginResponse != null && loginResponse.error != null)
-                Snackbar.make(activityBinding.buttonLoginSubmit, "Error: "+ loginResponse.error.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+                if (loginResponse != null && loginResponse.error != null)
+                    Snackbar.make(activityBinding.buttonLoginSubmit, "Error: " + loginResponse.error.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 break;
             }
             case ERROR: {
                 //display error message/dialog
-                Snackbar.make(activityBinding.buttonLoginSubmit, "Error: "+ resource.message, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(activityBinding.buttonLoginSubmit, "Error: " + resource.message, Snackbar.LENGTH_LONG).show();
                 break;
             }
 
         }
         showOverlay(false);
-        if (loginData != null){
+        if (loginData != null) {
             loginData.removeObserver(this::processLoginResource);
             loginData = null;
         }

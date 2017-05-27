@@ -10,9 +10,13 @@ import android.text.TextUtils;
 import com.example.dharkael.tweeter.api.LoginBody;
 import com.example.dharkael.tweeter.api.LoginResponse;
 import com.example.dharkael.tweeter.api.TweetService;
+import com.example.dharkael.tweeter.data.UserDao;
+import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,13 +28,15 @@ import static com.example.dharkael.tweeter.ui.login.LoginViewModel.Status.SUCCES
 
 public class LoginViewModel extends ViewModel {
     private final TweetService tweetService;
+    private final UserDao userDao;
     private final LiveData<Boolean> validLoginData;
     private MutableLiveData<String> passwordData = new MutableLiveData<>();
     private MutableLiveData<String> usernameData = new MutableLiveData<>();
 
     @Inject
-    public LoginViewModel(TweetService tweetService) {
+    public LoginViewModel(TweetService tweetService, UserDao userDao) {
         this.tweetService = tweetService;
+        this.userDao = userDao;
         validLoginData = combine(usernameData,
                 passwordData, this::validate);
         usernameData.setValue(null);
@@ -54,6 +60,13 @@ public class LoginViewModel extends ViewModel {
         passwordData.setValue(data);
     }
 
+    void setAuthenticatedUserId(AuthenticatedUserId authenticatedUserId) {
+        Observable.just(authenticatedUserId)
+                .singleElement()
+                .observeOn(Schedulers.io())
+                .subscribe(userDao::upsertAuthenticatedUserId);
+    }
+
     LiveData<Resource<LoginResponse>> login() {
         final String username = usernameData.getValue();
         final String password = passwordData.getValue();
@@ -69,14 +82,14 @@ public class LoginViewModel extends ViewModel {
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
-                    if(response.isSuccessful()){
-                        result.setValue(Resource.success(response.body()));
-                    }
+                if (response.isSuccessful()) {
+                    result.setValue(Resource.success(response.body()));
+                }
             }
 
             @Override
             public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
-                        result.setValue(Resource.error(t.getLocalizedMessage()));
+                result.setValue(Resource.error(t.getLocalizedMessage()));
             }
         });
 
@@ -84,13 +97,21 @@ public class LoginViewModel extends ViewModel {
     }
 
 
+    public enum Status {
+        ERROR, LOADING, SUCCESS
+    }
+
     /*
      This class taken (and modified) from https://developer.android.com/topic/libraries/architecture/guide.html#addendum
      */
     static public class Resource<T> {
-        @NonNull public final Status status;
-        @Nullable public final T data;
-        @Nullable public final String message;
+        @NonNull
+        public final Status status;
+        @Nullable
+        public final T data;
+        @Nullable
+        public final String message;
+
         private Resource(@NonNull Status status, @Nullable T data, @Nullable String message) {
             this.status = status;
             this.data = data;
@@ -109,12 +130,4 @@ public class LoginViewModel extends ViewModel {
             return new Resource<>(LOADING, null, null);
         }
     }
-
-    public enum Status {
-        ERROR, LOADING, SUCCESS
-    }
-
-
-
-
 }

@@ -1,14 +1,22 @@
 package com.example.dharkael.tweeter;
 
+import android.arch.lifecycle.LifecycleActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
+import com.example.dharkael.tweeter.data.UserDao;
+import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 import com.example.dharkael.tweeter.ui.login.LoginActivity;
 
-public class MainActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+public class MainActivity extends LifecycleActivity {
+
+    @Inject
+    UserDao userDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((TweeterApp) getApplication()).appComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
@@ -16,8 +24,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        gotoLogin();
+        userDao.getAuthenticatedUserId().observe(this,this::maybeGotoLogin);
+    }
 
+    private void maybeGotoLogin(AuthenticatedUserId authenticatedUserId){
+        if (authenticatedUserId == null) {
+            gotoLogin();
+        }
     }
 
     private void gotoLogin() {
