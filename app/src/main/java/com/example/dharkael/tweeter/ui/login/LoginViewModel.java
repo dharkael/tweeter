@@ -13,8 +13,6 @@ import com.example.dharkael.tweeter.api.TweetService;
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
@@ -30,17 +28,19 @@ public class LoginViewModel extends ViewModel {
     private final TweetService tweetService;
     private final UserDao userDao;
     private final LiveData<Boolean> validLoginData;
-    private MutableLiveData<String> passwordData = new MutableLiveData<>();
-    private MutableLiveData<String> usernameData = new MutableLiveData<>();
+    private final MutableLiveData<String> passwordData;
+    private final MutableLiveData<String> usernameData;
 
-    @Inject
-    public LoginViewModel(TweetService tweetService, UserDao userDao) {
+    public LoginViewModel(TweetService tweetService, UserDao userDao, MutableLiveData<String> usernameData, MutableLiveData<String> passwordData) {
         this.tweetService = tweetService;
         this.userDao = userDao;
+        this.usernameData = usernameData;
+        this.passwordData = passwordData;
         validLoginData = combine(usernameData,
                 passwordData, this::validate);
         usernameData.setValue(null);
     }
+
 
     private boolean validate(String username, String password) {
         return !(TextUtils.isEmpty(username) || TextUtils.isEmpty(password));

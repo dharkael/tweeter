@@ -1,12 +1,15 @@
 package com.example.dharkael.tweeter.dagger;
 
 import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
 
+import com.example.dharkael.tweeter.api.TweetService;
 import com.example.dharkael.tweeter.data.AppDatabase;
 import com.example.dharkael.tweeter.data.TweetDao;
 import com.example.dharkael.tweeter.data.UserDao;
+import com.example.dharkael.tweeter.ui.login.LoginViewModel;
 
 import javax.inject.Singleton;
 
@@ -53,6 +56,11 @@ public class AppModule {
     ViewModelProvider.Factory provideViewModelFactory(
             ViewModelSubComponent.Builder viewModelSubComponent) {
         return new ViewModelFactory(viewModelSubComponent.build());
+    }
+
+    @Provides
+    LoginViewModel providesLoginViewModel(TweetService tweetService, UserDao userDao){
+        return new LoginViewModel(tweetService, userDao, new MutableLiveData<>(), new MutableLiveData<>());
     }
 
 }
