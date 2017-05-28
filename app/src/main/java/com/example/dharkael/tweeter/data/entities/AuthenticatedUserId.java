@@ -26,4 +26,34 @@ public class AuthenticatedUserId {
     }
     @Ignore
     public AuthenticatedUserId(String userId, long updatedAt) {this(ID, userId, updatedAt); }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AuthenticatedUserId userId1 = (AuthenticatedUserId) o;
+
+        if (id != userId1.id) return false;
+        if (updatedAt != userId1.updatedAt) return false;
+        return userId != null ? userId.equals(userId1.userId) : userId1.userId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
+        result = 31 * result + (int) (updatedAt ^ (updatedAt >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthenticatedUserId{" +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

@@ -42,4 +42,13 @@ public class User {
         result = 31 * result + (int) (createdAt ^ (createdAt >>> 32));
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

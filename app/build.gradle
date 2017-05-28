@@ -42,6 +42,7 @@ ext {
     android_arch_version = "1.0.0-alpha1"
     rxjava_version = "2.0.9"
     support_version = "25.3.1"
+    mockito_version = "2.8.9"
 
 }
 dependencies {
@@ -50,14 +51,20 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    compile "com.android.support:appcompat-v7:$support_version"
+    compile "com.android.support:design:$support_version"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+
     //Lifecycles, LiveData, and ViewModel
     compile "android.arch.lifecycle:runtime:$android_arch_version"
     compile "android.arch.lifecycle:extensions:$android_arch_version"
     annotationProcessor "android.arch.lifecycle:compiler:$android_arch_version"
+    testCompile "android.arch.core:core-testing:$android_arch_version"
     //Room
     compile "android.arch.persistence.room:runtime:$android_arch_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$android_arch_version"
     compile "android.arch.persistence.room:rxjava2:$android_arch_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$android_arch_version"
     // rx
     compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
 
@@ -71,16 +78,17 @@ dependencies {
 
     //dagger
     compile "com.google.dagger:dagger:$dagger_version"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
     compile "com.google.dagger:dagger-android:$dagger_version"
     compile "com.google.dagger:dagger-android-support:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
     // if you use the support libraries
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    compile "com.android.support:appcompat-v7:$support_version"
-    compile "com.android.support:design:$support_version"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.code.findbugs:jsr305:3.0.1'
+    androidTestCompile "org.mockito:mockito-core:$mockito_version"
+    androidTestCompile "org.mockito:mockito-android:$mockito_version"
+
+
 }
