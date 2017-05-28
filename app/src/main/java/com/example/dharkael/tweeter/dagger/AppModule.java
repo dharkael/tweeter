@@ -11,6 +11,7 @@ import com.example.dharkael.tweeter.data.AppDatabase;
 import com.example.dharkael.tweeter.data.TweetDao;
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.ui.login.LoginViewModel;
+import com.example.dharkael.tweeter.ui.tweets.TweetsViewModel;
 
 import javax.inject.Singleton;
 
@@ -63,8 +64,13 @@ public class AppModule {
     }
 
     @Provides
-    LoginViewModel providesLoginViewModel(TweetService tweetService, UserDao userDao, RxSchedulers schedulers){
+    LoginViewModel provideLoginViewModel(TweetService tweetService, UserDao userDao, RxSchedulers schedulers){
         return new LoginViewModel(tweetService, userDao, new MutableLiveData<>(), new MutableLiveData<>(), schedulers);
+    }
+
+    @Provides
+    TweetsViewModel provideTweetsViewModel(TweetDao tweetDao, UserDao userDao){
+        return new TweetsViewModel(tweetDao, userDao);
     }
 
     @Provides

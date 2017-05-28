@@ -1,11 +1,13 @@
 package com.example.dharkael.tweeter;
 
 import android.arch.lifecycle.LifecycleActivity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 import com.example.dharkael.tweeter.ui.login.LoginActivity;
+import com.example.dharkael.tweeter.ui.tweets.TweetsActivity;
 
 import javax.inject.Inject;
 
@@ -30,10 +32,17 @@ public class MainActivity extends LifecycleActivity {
     private void maybeGotoLogin(AuthenticatedUserId authenticatedUserId){
         if (authenticatedUserId == null) {
             gotoLogin();
+        } else {
+            gotoTweets(authenticatedUserId.userId);
         }
     }
 
     private void gotoLogin() {
         startActivity(LoginActivity.intentForStart(this));
+    }
+
+    private void gotoTweets(String userId){
+        final Intent intentForStart = TweetsActivity.intentForStart(this, userId);
+        startActivity(intentForStart);
     }
 }

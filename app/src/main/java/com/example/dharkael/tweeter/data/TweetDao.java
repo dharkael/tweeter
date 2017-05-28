@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 
 
 import com.example.dharkael.tweeter.data.entities.Tweet;
+import com.example.dharkael.tweeter.data.pojos.TweetAndSender;
 
 import java.util.List;
 
@@ -20,4 +21,9 @@ public interface TweetDao {
 
     @Query("SELECT * FROM tweet WHERE user_id = :userId")
     LiveData<List<Tweet>> getTweets(String userId);
+
+    @Query("SELECT tweet.* , user.name AS users_name, user.id AS users_id, "
+            +" user.created_at AS  users_created_at "
+            +"FROM tweet , user WHERE user_id = :userId  AND user.id == user_id")
+    LiveData<List<TweetAndSender>> getTweetAndSenders(String userId);
 }

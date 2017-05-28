@@ -10,6 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.example.dharkael.tweeter.TestUtils;
 import com.example.dharkael.tweeter.data.entities.Tweet;
 import com.example.dharkael.tweeter.data.entities.User;
+import com.example.dharkael.tweeter.data.pojos.TweetAndSender;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,6 +62,23 @@ public class TweetDaoTest {
         tweetDao.insertTweet(tweet1);
         final LiveData<List<Tweet>> liveData = tweetDao.getTweets(user.id);
         final List<Tweet> actual = getValue(liveData);
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    public void getTweetAndSenders() throws Exception {
+        Tweet tweet = creatTweet();
+        Tweet tweet1 = creatTweet1();
+        TweetAndSender tweetAndSender = new TweetAndSender(tweet,user);
+        TweetAndSender tweetAndSender1 = new TweetAndSender(tweet1,user);
+        List<TweetAndSender> expected = new ArrayList<>();
+        expected.add(tweetAndSender);
+        expected.add(tweetAndSender1);
+
+        tweetDao.insertTweet(tweet);
+        tweetDao.insertTweet(tweet1);
+        final LiveData<List<TweetAndSender>> liveData = tweetDao.getTweetAndSenders(user.id);
+        final List<TweetAndSender> actual = getValue(liveData);
         assertThat(actual, equalTo(expected));
     }
 

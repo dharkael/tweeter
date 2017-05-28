@@ -1,6 +1,7 @@
 package com.example.dharkael.tweeter.dagger;
 
 import com.example.dharkael.tweeter.ui.login.LoginViewModel;
+import com.example.dharkael.tweeter.ui.tweets.TweetsViewModel;
 
 import dagger.Subcomponent;
 
@@ -13,5 +14,7 @@ public interface ViewModelSubComponent {
     }
 
     LoginViewModel loginViewModel();
+
+    TweetsViewModel tweetsViewModel();
 
 }

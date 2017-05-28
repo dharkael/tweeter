@@ -6,6 +6,8 @@ import com.example.dharkael.tweeter.dagger.AppComponent;
 import com.example.dharkael.tweeter.dagger.AppModule;
 import com.example.dharkael.tweeter.dagger.DaggerAppComponent;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 
 public class TweeterApp extends Application {
 
@@ -14,6 +16,7 @@ public class TweeterApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        JodaTimeAndroid.init(this);
 
         initAppComponent();
     }
