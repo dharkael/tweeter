@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
 
+import com.example.dharkael.tweeter.RxSchedulers;
 import com.example.dharkael.tweeter.api.TweetService;
 import com.example.dharkael.tweeter.data.AppDatabase;
 import com.example.dharkael.tweeter.data.TweetDao;
@@ -15,6 +16,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 @Module(subcomponents = {ViewModelSubComponent.class}, includes = {NetworkModule.class})
 public class AppModule {
@@ -59,8 +63,29 @@ public class AppModule {
     }
 
     @Provides
-    LoginViewModel providesLoginViewModel(TweetService tweetService, UserDao userDao){
-        return new LoginViewModel(tweetService, userDao, new MutableLiveData<>(), new MutableLiveData<>());
+    LoginViewModel providesLoginViewModel(TweetService tweetService, UserDao userDao, RxSchedulers schedulers){
+        return new LoginViewModel(tweetService, userDao, new MutableLiveData<>(), new MutableLiveData<>(), schedulers);
+    }
+
+    @Provides
+    @Singleton
+    RxSchedulers provideRxSchedulers(){
+        return new RxSchedulers() {
+            @Override
+            public Scheduler io() {
+                return Schedulers.io();
+            }
+
+            @Override
+            public Scheduler computation() {
+                return Schedulers.computation();
+            }
+
+            @Override
+            public Scheduler main() {
+                return AndroidSchedulers.mainThread();
+            }
+        };
     }
 
 }

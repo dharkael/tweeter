@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.example.dharkael.tweeter.RxSchedulers;
 import com.example.dharkael.tweeter.api.LoginBody;
 import com.example.dharkael.tweeter.api.LoginResponse;
 import com.example.dharkael.tweeter.api.TweetService;
@@ -14,7 +15,6 @@ import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,12 +30,14 @@ public class LoginViewModel extends ViewModel {
     private final LiveData<Boolean> validLoginData;
     private final MutableLiveData<String> passwordData;
     private final MutableLiveData<String> usernameData;
+    private final RxSchedulers schedulers;
 
-    public LoginViewModel(TweetService tweetService, UserDao userDao, MutableLiveData<String> usernameData, MutableLiveData<String> passwordData) {
+    public LoginViewModel(TweetService tweetService, UserDao userDao, MutableLiveData<String> usernameData, MutableLiveData<String> passwordData, RxSchedulers schedulers) {
         this.tweetService = tweetService;
         this.userDao = userDao;
         this.usernameData = usernameData;
         this.passwordData = passwordData;
+        this.schedulers = schedulers;
         validLoginData = combine(usernameData,
                 passwordData, this::validate);
         usernameData.setValue(null);
@@ -63,7 +65,7 @@ public class LoginViewModel extends ViewModel {
     void setAuthenticatedUserId(AuthenticatedUserId authenticatedUserId) {
         Observable.just(authenticatedUserId)
                 .singleElement()
-                .observeOn(Schedulers.io())
+                .observeOn(schedulers.io())
                 .subscribe(userDao::upsertAuthenticatedUserId);
     }
 
