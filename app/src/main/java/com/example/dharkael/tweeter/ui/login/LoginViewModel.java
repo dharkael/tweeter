@@ -7,14 +7,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.example.dharkael.tweeter.RxSchedulers;
 import com.example.dharkael.tweeter.api.LoginBody;
 import com.example.dharkael.tweeter.api.LoginResponse;
 import com.example.dharkael.tweeter.api.TweetService;
+import com.example.dharkael.tweeter.data.TweetDao;
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
+import com.example.dharkael.tweeter.data.entities.Tweet;
+import com.example.dharkael.tweeter.data.entities.User;
 
-import io.reactivex.Observable;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+
+import javax.annotation.Nonnull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,22 +34,23 @@ import static com.example.dharkael.tweeter.ui.login.LoginViewModel.Status.SUCCES
 public class LoginViewModel extends ViewModel {
     private final TweetService tweetService;
     private final UserDao userDao;
+    private final TweetDao tweetDao;
     private final LiveData<Boolean> validLoginData;
     private final MutableLiveData<String> passwordData;
     private final MutableLiveData<String> usernameData;
-    private final RxSchedulers schedulers;
+    private final ExecutorService executorService;
 
-    public LoginViewModel(TweetService tweetService, UserDao userDao, MutableLiveData<String> usernameData, MutableLiveData<String> passwordData, RxSchedulers schedulers) {
+    public LoginViewModel(TweetService tweetService, UserDao userDao, TweetDao tweetDao, MutableLiveData<String> usernameData, MutableLiveData<String> passwordData, ExecutorService executorService) {
         this.tweetService = tweetService;
         this.userDao = userDao;
+        this.tweetDao = tweetDao;
         this.usernameData = usernameData;
         this.passwordData = passwordData;
-        this.schedulers = schedulers;
         validLoginData = combine(usernameData,
                 passwordData, this::validate);
         usernameData.setValue(null);
+         this.executorService = executorService;
     }
-
 
     private boolean validate(String username, String password) {
         return !(TextUtils.isEmpty(username) || TextUtils.isEmpty(password));
@@ -53,7 +61,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     void setUsername(CharSequence username) {
-        String data = username == null ? null : username.toString();
+        String data = username == null ? null : username.toString().toLowerCase();
         usernameData.setValue(data);
     }
 
@@ -63,10 +71,11 @@ public class LoginViewModel extends ViewModel {
     }
 
     void setAuthenticatedUserId(AuthenticatedUserId authenticatedUserId) {
-        Observable.just(authenticatedUserId)
-                .singleElement()
-                .observeOn(schedulers.io())
-                .subscribe(userDao::upsertAuthenticatedUserId);
+        final String userId =authenticatedUserId.userId;
+        executorService.submit(()->{
+            userDao.upsertAuthenticatedUserId(authenticatedUserId);
+            downloadFollowersAndTimeline(userId);
+        });
     }
 
     LiveData<Resource<LoginResponse>> login() {
@@ -96,6 +105,26 @@ public class LoginViewModel extends ViewModel {
         });
 
         return result;
+    }
+
+    void downloadFollowersAndTimeline(@Nonnull String userId)  {
+        final Call<List<User>> followingCall = tweetService.following(userId);
+        try {
+            final Response<List<User>> followingResponse = followingCall.execute();
+            if (followingResponse.isSuccessful()) {
+                final List<User> users = followingResponse.body();
+                userDao.insertUsers(users);
+                final Call<List<Tweet>> timelineCall = tweetService.timeline(userId, -1);
+                final Response<List<Tweet>> timelineResponse = timelineCall.execute();
+                if(timelineResponse.isSuccessful()){
+                    final List<Tweet> tweets = timelineResponse.body();
+                    tweetDao.insertTweets(tweets);
+                }
+            }
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
+
     }
 
 

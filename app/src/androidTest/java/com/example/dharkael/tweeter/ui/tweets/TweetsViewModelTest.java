@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -48,7 +49,7 @@ public class TweetsViewModelTest {
         String userId = "USER_ID";
         viewModel.setUserId(userId);
         verify(userDao).loadUser(userId);
-        verify(tweetDao).getTweetAndSenders(userId);
+        verify(tweetDao).getTweetAndSenders();
         viewModel.setUserId(userId);
         verifyNoMoreInteractions(userDao);
         verifyNoMoreInteractions(tweetDao);
@@ -60,17 +61,17 @@ public class TweetsViewModelTest {
         String userId1 = userId + "1";
         viewModel.setUserId(userId);
         verify(userDao).loadUser(userId);
-        verify(tweetDao).getTweetAndSenders(userId);
+        verify(tweetDao).getTweetAndSenders();
         viewModel.setUserId(userId1);
         verify(userDao).loadUser(userId1);
-        verify(tweetDao).getTweetAndSenders(userId1);
+        verify(tweetDao, times(2)).getTweetAndSenders();
     }
 
     @Test
     public void setUserIdNull() throws Exception {
         viewModel.setUserId(null);
         verify(userDao).loadUser(null);
-        verify(tweetDao).getTweetAndSenders(null);
+        verify(tweetDao).getTweetAndSenders();
     }
 
     @Test
@@ -102,7 +103,7 @@ public class TweetsViewModelTest {
         MutableLiveData<List<TweetAndSender>> tweetAndSendersData = new MutableLiveData<>();
         tweetAndSendersData.setValue(tweetAndSenders);
 
-        when(tweetDao.getTweetAndSenders(user.id)).thenReturn(tweetAndSendersData);
+        when(tweetDao.getTweetAndSenders()).thenReturn(tweetAndSendersData);
         viewModel.setUserId(user.id);
         final LiveData<List<TweetAndSender>> liveData = viewModel.getTweetAndSenders();
         final List<TweetAndSender> actual = getValue(liveData);

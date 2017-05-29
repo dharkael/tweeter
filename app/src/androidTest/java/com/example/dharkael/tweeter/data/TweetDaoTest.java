@@ -77,9 +77,23 @@ public class TweetDaoTest {
 
         tweetDao.insertTweet(tweet);
         tweetDao.insertTweet(tweet1);
-        final LiveData<List<TweetAndSender>> liveData = tweetDao.getTweetAndSenders(user.id);
+        final LiveData<List<TweetAndSender>> liveData = tweetDao.getTweetAndSenders();
         final List<TweetAndSender> actual = getValue(liveData);
         assertThat(actual, equalTo(expected));
+    }
+
+
+    @Test
+    public void insertTweets() throws Exception {
+        Tweet tweet = creatTweet();
+        Tweet tweet1 = creatTweet1();
+        ArrayList<Tweet> tweets = new ArrayList<>();
+        tweets.add(tweet);
+        tweets.add(tweet1);
+        tweetDao.insertTweets(tweets);
+        final LiveData<List<Tweet>> liveData = tweetDao.getTweets(user.id);
+        final List<Tweet> actual = getValue(liveData);
+        assertThat(actual, equalTo(tweets));
     }
 
     private <T> T getValue(LiveData<T> liveData) throws InterruptedException {

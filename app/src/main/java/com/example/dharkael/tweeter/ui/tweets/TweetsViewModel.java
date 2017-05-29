@@ -28,7 +28,7 @@ public class TweetsViewModel extends ViewModel {
         }
         this.userId = userId;
         user = userDao.loadUser(userId);
-        tweetAndSenders = tweetDao.getTweetAndSenders(userId);
+        tweetAndSenders = tweetDao.getTweetAndSenders();
     }
 
     LiveData<User> getUser() {

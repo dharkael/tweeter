@@ -13,6 +13,11 @@ import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.ui.login.LoginViewModel;
 import com.example.dharkael.tweeter.ui.tweets.TweetsViewModel;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -64,8 +69,14 @@ public class AppModule {
     }
 
     @Provides
-    LoginViewModel provideLoginViewModel(TweetService tweetService, UserDao userDao, RxSchedulers schedulers){
-        return new LoginViewModel(tweetService, userDao, new MutableLiveData<>(), new MutableLiveData<>(), schedulers);
+    @Named("SingleThreaded")
+    ExecutorService provideSingleThreadedExecutorService(){
+        return Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @Provides
+    LoginViewModel provideLoginViewModel(TweetService tweetService, UserDao userDao,TweetDao tweetDao,  @Named("SingleThreaded") ExecutorService executorService){
+        return new LoginViewModel(tweetService, userDao ,tweetDao, new MutableLiveData<>(), new MutableLiveData<>(), executorService);
     }
 
     @Provides

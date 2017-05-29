@@ -21,6 +21,9 @@ public interface UserDao {
     @Insert(onConflict = REPLACE)
     void insertUser(User user);
 
+    @Insert(onConflict = REPLACE)
+    void insertUsers(List<User> userList);
+
     @Update
     void updateUser(User user);
 
@@ -45,5 +48,6 @@ public interface UserDao {
 
     @Query("SELECT * FROM authenticated_user_id WHERE id = :id LIMIT 1")
     LiveData<AuthenticatedUserId> getAuthenticatedUserId(int id);
+
 
 }

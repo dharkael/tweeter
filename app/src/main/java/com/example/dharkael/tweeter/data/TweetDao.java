@@ -19,11 +19,14 @@ public interface TweetDao {
     @Insert(onConflict = REPLACE)
     void insertTweet(Tweet tweet);
 
+    @Insert(onConflict = REPLACE)
+    void insertTweets(List<Tweet>  tweets);
+
     @Query("SELECT * FROM tweet WHERE user_id = :userId")
     LiveData<List<Tweet>> getTweets(String userId);
 
     @Query("SELECT tweet.* , user.name AS users_name, user.id AS users_id, "
             +" user.created_at AS  users_created_at "
-            +"FROM tweet , user WHERE user_id = :userId  AND user.id == user_id")
-    LiveData<List<TweetAndSender>> getTweetAndSenders(String userId);
+            +"FROM tweet , user WHERE  user.id == user_id ORDER BY created_at DESC")
+    LiveData<List<TweetAndSender>> getTweetAndSenders();
 }
