@@ -13,7 +13,6 @@ import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.ui.login.LoginViewModel;
 import com.example.dharkael.tweeter.ui.tweets.TweetsViewModel;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,15 +29,16 @@ import io.reactivex.schedulers.Schedulers;
 public class AppModule {
     private Application app;
 
-    public AppModule(Application app){
+    public AppModule(Application app) {
         this.app = app;
     }
 
     @Provides
     @Singleton
-    public Application provideApplication(){
+    public Application provideApplication() {
         return app;
     }
+
     @Provides
     @Singleton
     public AppDatabase provideDatabase(Application app) {
@@ -50,14 +50,14 @@ public class AppModule {
 
     @Singleton
     @Provides
-    UserDao provideUserDao(AppDatabase appDatabase){
+    UserDao provideUserDao(AppDatabase appDatabase) {
         return appDatabase.userDao();
     }
 
 
     @Singleton
     @Provides
-    TweetDao provideTweetDao(AppDatabase appDatabase){
+    TweetDao provideTweetDao(AppDatabase appDatabase) {
         return appDatabase.tweetDao();
     }
 
@@ -70,23 +70,25 @@ public class AppModule {
 
     @Provides
     @Named("SingleThreaded")
-    ExecutorService provideSingleThreadedExecutorService(){
+    ExecutorService provideSingleThreadedExecutorService() {
         return Executors.newSingleThreadScheduledExecutor();
     }
 
     @Provides
-    LoginViewModel provideLoginViewModel(TweetService tweetService, UserDao userDao,TweetDao tweetDao,  @Named("SingleThreaded") ExecutorService executorService){
-        return new LoginViewModel(tweetService, userDao ,tweetDao, new MutableLiveData<>(), new MutableLiveData<>(), executorService);
+    LoginViewModel provideLoginViewModel(TweetService tweetService, UserDao userDao, TweetDao tweetDao, @Named("SingleThreaded") ExecutorService executorService) {
+        return new LoginViewModel(tweetService, userDao, tweetDao, new MutableLiveData<>(), new MutableLiveData<>(), executorService);
     }
 
     @Provides
-    TweetsViewModel provideTweetsViewModel(TweetDao tweetDao, UserDao userDao){
-        return new TweetsViewModel(tweetDao, userDao);
+    TweetsViewModel provideTweetsViewModel(TweetDao tweetDao,
+                                           UserDao userDao,
+                                           @Named("SingleThreaded") ExecutorService executorService) {
+        return new TweetsViewModel(tweetDao, userDao, executorService);
     }
 
     @Provides
     @Singleton
-    RxSchedulers provideRxSchedulers(){
+    RxSchedulers provideRxSchedulers() {
         return new RxSchedulers() {
             @Override
             public Scheduler io() {

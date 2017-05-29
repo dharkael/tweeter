@@ -4,4 +4,7 @@
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="profile_image">Profile Image</string>
+    <string name="add_tweet">Add Tweet</string>
+    <string name="tweet">Tweet</string>
+    <string name="cancel">Cancel</string>
 </resources>

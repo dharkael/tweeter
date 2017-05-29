@@ -5,10 +5,14 @@ import android.arch.lifecycle.ViewModel;
 
 import com.example.dharkael.tweeter.data.TweetDao;
 import com.example.dharkael.tweeter.data.UserDao;
+import com.example.dharkael.tweeter.data.entities.Tweet;
 import com.example.dharkael.tweeter.data.entities.User;
 import com.example.dharkael.tweeter.data.pojos.TweetAndSender;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
 
 public class TweetsViewModel extends ViewModel {
@@ -17,9 +21,11 @@ public class TweetsViewModel extends ViewModel {
     private String userId;
     private LiveData<List<TweetAndSender>> tweetAndSenders;
     private LiveData<User> user;
-    public TweetsViewModel(TweetDao tweetDao, UserDao userDao) {
+    private final ExecutorService executorService;
+    public TweetsViewModel(TweetDao tweetDao, UserDao userDao, ExecutorService executorService) {
         this.tweetDao = tweetDao;
         this.userDao = userDao;
+        this.executorService = executorService;
     }
 
     public void setUserId(String userId) {
@@ -38,4 +44,13 @@ public class TweetsViewModel extends ViewModel {
     LiveData<List<TweetAndSender>> getTweetAndSenders() {
         return tweetAndSenders;
     }
+
+     public void addTweet(String text) {
+        long createdAt = new Date().getTime();
+        final String tweetId = String.format(Locale.US, "%s_%d", userId, createdAt);
+        final Tweet tweet = new Tweet(tweetId, createdAt, text, userId);
+        executorService.submit(() -> tweetDao.insertTweet(tweet));
+    }
+
+
 }

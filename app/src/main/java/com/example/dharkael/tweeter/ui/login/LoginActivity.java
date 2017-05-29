@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -19,14 +18,13 @@ import com.example.dharkael.tweeter.TweeterApp;
 import com.example.dharkael.tweeter.api.LoginResponse;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 import com.example.dharkael.tweeter.databinding.ActivityLoginBinding;
+import com.example.dharkael.tweeter.ui.TextChangedWatcher;
 import com.example.dharkael.tweeter.ui.login.LoginViewModel.Resource;
 
 import java.util.Date;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
-import io.reactivex.functions.Consumer;
 
 public class LoginActivity extends LifecycleActivity {
 
@@ -123,31 +121,6 @@ public class LoginActivity extends LifecycleActivity {
         if (loginData != null) {
             loginData.removeObserver(this::processLoginResource);
             loginData = null;
-        }
-    }
-
-    private static class TextChangedWatcher implements android.text.TextWatcher {
-        private Consumer<CharSequence> consumer;
-
-        TextChangedWatcher(Consumer<CharSequence> consumer) {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            try {
-                consumer.accept(s);
-            } catch (Exception e) {
-                Log.e("TextChangedWatcher", e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
         }
     }
 
