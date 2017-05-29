@@ -1,6 +1,6 @@
 package com.example.dharkael.tweeter.dagger;
 
-import com.example.dharkael.tweeter.MainActivity;
+import com.example.dharkael.tweeter.ui.MainActivity;
 import com.example.dharkael.tweeter.ui.login.LoginActivity;
 import com.example.dharkael.tweeter.ui.tweets.TweetsActivity;
 

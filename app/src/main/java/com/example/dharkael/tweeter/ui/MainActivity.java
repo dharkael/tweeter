@@ -1,10 +1,12 @@
-package com.example.dharkael.tweeter;
+package com.example.dharkael.tweeter.ui;
 
 import android.arch.lifecycle.LifecycleActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.dharkael.tweeter.R;
+import com.example.dharkael.tweeter.TweeterApp;
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
 import com.example.dharkael.tweeter.ui.login.LoginActivity;
