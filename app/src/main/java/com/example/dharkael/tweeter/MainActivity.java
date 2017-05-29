@@ -3,6 +3,7 @@ package com.example.dharkael.tweeter;
 import android.arch.lifecycle.LifecycleActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.dharkael.tweeter.data.UserDao;
 import com.example.dharkael.tweeter.data.entities.AuthenticatedUserId;
@@ -15,6 +16,7 @@ public class MainActivity extends LifecycleActivity {
 
     @Inject
     UserDao userDao;
+    private AuthenticatedUserId lastAuthUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +26,22 @@ public class MainActivity extends LifecycleActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        userDao.getAuthenticatedUserId().observe(this,this::maybeGotoLogin);
+    protected void onResume() {
+        super.onResume();
+        userDao.getAuthenticatedUserId().observe(this, this::maybeGotoLogin);
     }
 
-    private void maybeGotoLogin(AuthenticatedUserId authenticatedUserId){
+    @Override
+    protected void onPause() {
+        userDao.getAuthenticatedUserId().removeObserver(this::maybeGotoLogin);
+        lastAuthUserId = null;
+        super.onPause();
+    }
+
+    private void maybeGotoLogin(AuthenticatedUserId authenticatedUserId) {
+        if(lastAuthUserId != null && lastAuthUserId.equals(authenticatedUserId)) return;
+        lastAuthUserId = authenticatedUserId;
+        Log.i("MainActivity", "maybeGotoLogin " + authenticatedUserId);
         if (authenticatedUserId == null) {
             gotoLogin();
         } else {
@@ -41,7 +53,7 @@ public class MainActivity extends LifecycleActivity {
         startActivity(LoginActivity.intentForStart(this));
     }
 
-    private void gotoTweets(String userId){
+    private void gotoTweets(String userId) {
         final Intent intentForStart = TweetsActivity.intentForStart(this, userId);
         startActivity(intentForStart);
     }

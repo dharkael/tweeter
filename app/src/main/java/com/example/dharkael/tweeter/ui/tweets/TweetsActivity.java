@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,8 +81,14 @@ public class TweetsActivity extends AppCompatActivity implements LifecycleRegist
             activityBinding.executePendingBindings();
         });
 
+        viewModel.getAuthenticatedUserId().observe(this, authenticatedUserId -> {
+            if(authenticatedUserId == null){
+                Log.i("TweetsActivity", "authenticatedUserId == null");
+                finish();
+                finish();
+            }
+        });
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_tweets, menu);
@@ -94,9 +101,11 @@ public class TweetsActivity extends AppCompatActivity implements LifecycleRegist
             case R.id.item_menu_tweets_add_tweet:
                   showAddTweetDialog();
                 break;
+            case R.id.item_menu_tweets_sign_out:
+                viewModel.signOut();
+                break;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
 
         return true;

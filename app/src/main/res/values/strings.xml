@@ -7,4 +7,5 @@
     <string name="add_tweet">Add Tweet</string>
     <string name="tweet">Tweet</string>
     <string name="cancel">Cancel</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

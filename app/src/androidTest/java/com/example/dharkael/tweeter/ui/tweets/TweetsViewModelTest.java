@@ -21,6 +21,8 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
@@ -36,12 +38,14 @@ public class TweetsViewModelTest {
     private TweetDao tweetDao;
     private UserDao userDao;
     private TweetsViewModel viewModel;
+    private ExecutorService executorService;
 
     @Before
     public void setUp() throws Exception {
         tweetDao = mock(TweetDao.class);
         userDao = mock(UserDao.class);
-        viewModel = new TweetsViewModel(tweetDao, userDao);
+       executorService = Executors.newSingleThreadExecutor();
+        viewModel = new TweetsViewModel(tweetDao, userDao, executorService);
     }
 
     @Test

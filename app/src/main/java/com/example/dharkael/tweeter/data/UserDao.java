@@ -49,5 +49,10 @@ public interface UserDao {
     @Query("SELECT * FROM authenticated_user_id WHERE id = :id LIMIT 1")
     LiveData<AuthenticatedUserId> getAuthenticatedUserId(int id);
 
+    @Query("DELETE FROM user WHERE 1 == 1")
+    void delete();
+
+    @Query("DELETE FROM authenticated_user_id WHERE 1 == 1")
+    void deleteAuthenticatedUserId();
 
 }

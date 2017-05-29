@@ -6,7 +6,6 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-
 import com.example.dharkael.tweeter.data.entities.Tweet;
 import com.example.dharkael.tweeter.data.pojos.TweetAndSender;
 
@@ -29,4 +28,7 @@ public interface TweetDao {
             +" user.created_at AS  users_created_at "
             +"FROM tweet , user WHERE  user.id == user_id ORDER BY created_at DESC")
     LiveData<List<TweetAndSender>> getTweetAndSenders();
+
+  @Query("DELETE FROM tweet WHERE 1 == 1")
+  void delete();
 }
