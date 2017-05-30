@@ -37,7 +37,7 @@ Mostly the code is organized into various layers.
 - **dagger** DI related things
 - **remote** This is where I keep the MockwebServer.
 - **api** API/Network things (Retrofit)
--  **ui** This folder holds (you guest it) UI related things. Sub-packages organized by screen/feature. top folder holds common UI related modules.
+-  **ui** This folder holds (you guessed it) UI related things. Sub-packages organized by screen/feature. top folder holds common UI related modules.
 
 ## Testing incomplete.
 I have some tests in for the DAL and the ViewModel layers, of course I could have more.
